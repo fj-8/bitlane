@@ -4,7 +4,7 @@
 [![C++20](https://img.shields.io/badge/C%2B%2B-20-informational)](#development)
 [![dependencies: 0](https://img.shields.io/badge/dependencies-0-brightgreen)](#development)
 [![header-only](https://img.shields.io/badge/header--only-5%20files-yellow)](include/bitlane)
-[![tests: 31 passing](https://img.shields.io/badge/tests-31%20passing-success)](#correctness)
+[![tests: 32 passing](https://img.shields.io/badge/tests-32%20passing-success)](#correctness)
 [![built with MSVC 19.51](https://img.shields.io/badge/built%20with-MSVC%2019.51-6C3AC4)](#development)
 
 A header-only compressed bitmap index over sets of `std::uint32_t`: the data
@@ -304,7 +304,7 @@ Read these honestly:
 
 ## Correctness
 
-31 cases in `tests/bitmap_tests.cpp`, run by `ctest`:
+32 cases in `tests/bitmap_tests.cpp`, run by `ctest`:
 
 * algebra against the STL: 200 random trials where `|`, `&`, `^`, `-` are each
   checked against `std::set_union` / `set_intersection` /
@@ -331,9 +331,11 @@ Read these honestly:
   `min`/`max`, copy and move, `initializer_list` and `span` construction plus braced-list `insert`,
   `fingerprint` order-independence and value sensitivity;
 * codec: 40 random round trips plus explicit empty, single-value and
-  mixed-form ones, then field-by-field mutation of a valid buffer asserting
-  `decode` returns `std::nullopt` every time, and reproducibility on trailing
-  garbage;
+  mixed-form ones, then mutation of a valid buffer at chosen fields — magic,
+  version, reserved flags, declared slot count, first key, trailer — asserting
+  `decode` returns `std::nullopt` every time; a separate case flips the high bit
+  at **every offset** of a frame and requires rejection at each one; and
+  reproducibility on trailing garbage;
 * a memory assertion for the case compression exists to serve: `{0,
   4294967295}` costs 536 870 912 bytes flat and under 1 KiB here, and the test
   requires the gap to be at least 1000×.

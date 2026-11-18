@@ -443,6 +443,23 @@ TEST(decode_rejects_malformed_input) {
     CHECK(!bitmap::decode(corrupt).has_value());
 }
 
+TEST(every_single_byte_edit_of_a_frame_is_rejected) {
+    const bitmap b = of({1, 2, 3, 70000, 70001, 4'000'000'000});
+    const std::vector<std::uint8_t> good = b.encode();
+    CHECK(good.size() > 16); // containers present, not a bare header
+
+    // The checksum covers every preceding byte, so a flip in the header or the
+    // payload changes what decode() computes while leaving the stored value
+    // alone, and a flip inside the checksum does the reverse. Walking every
+    // offset beats sampling it: the frame is a few dozen bytes, so "every" is
+    // affordable, and it is the version of the claim the README makes.
+    for (std::size_t offset = 0; offset < good.size(); ++offset) {
+        auto corrupt = good;
+        corrupt[offset] ^= 0x80;
+        CHECK(!bitmap::decode(corrupt).has_value());
+    }
+}
+
 TEST(decode_is_reproducible_on_trailing_garbage) {
     const bitmap b = of({5, 6, 7});
     std::vector<std::uint8_t> bytes = b.encode();
