@@ -1,0 +1,132 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  merge_group:
+
+permissions:
+  contents: read
+
+env:
+  CTEST_OUTPUT_ON_FAILURE: 1
+
+jobs:
+  headers:
+    name: Every header compiles alone
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: One translation unit per header
+        run: |
+          set -euo pipefail
+          for f in include/bitlane/*.hpp; do
+            printf '#include <%s>\nint main() { return 0; }\n' "$f" > /tmp/probe.cpp
+            echo "--- $f"
+            g++ -std=c++20 -Wall -Wextra -Wpedantic -Werror -Iinclude -fsyntax-only /tmp/probe.cpp
+          done
+
+  test:
+    name: ${{ matrix.name }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: GCC
+            os: ubuntu-latest
+            generator: Ninja
+            cc: gcc
+            cxx: g++
+          - name: Clang
+            os: ubuntu-latest
+            generator: Ninja
+            cc: clang
+            cxx: clang++
+          - name: Apple Clang
+            os: macos-latest
+            generator: Ninja
+            cc: clang
+            cxx: clang++
+          - name: MSVC
+            os: windows-latest
+            generator: Visual Studio 17 2022
+            cc: ""
+            cxx: ""
+    steps:
+      - uses: actions/checkout@v4
+      # The Visual Studio generator picks its own toolset, so it gets no CC/CXX
+      # and needs the explicit platform; the Ninja legs get the opposite.
+      - name: Configure (Visual Studio)
+        if: matrix.cc == ''
+        run: cmake -S . -B build -G "${{ matrix.generator }}" -A x64 -DCMAKE_BUILD_TYPE=Release
+      - name: Configure (Ninja)
+        if: matrix.cc != ''
+        shell: bash
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: cmake -S . -B build -G "${{ matrix.generator }}" -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+      - name: Examples
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmake --build build --target example_posting_index example_tag_query
+          for wanted in example_posting_index example_tag_query; do
+            exe=$(find build -maxdepth 2 -name "$wanted*" -type f ! -name '*.obj' ! -name '*.o' | head -n1)
+            echo "--- $exe"
+            "./$exe"
+          done
+
+  strict-msvc:
+    name: Zero warnings (/W4 /WX)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure with /WX
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_CXX_FLAGS="/WX /utf-8"
+      - name: Build everything, including the benchmark
+        run: cmake --build build --config Release
+
+  package:
+    name: Installed package is usable
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure, build and install
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
+          cmake --install build --prefix /tmp/bitlane-prefix
+      - name: Build an unrelated consumer project
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/consumer
+          cat > /tmp/consumer/CMakeLists.txt <<'EOS'
+          cmake_minimum_required(VERSION 3.21)
+          project(consumer CXX)
+          find_package(bitlane 0.4 CONFIG REQUIRED)
+          add_executable(consumer main.cpp)
+          target_link_libraries(consumer PRIVATE bitlane::bitlane)
+          EOS
+          cat > /tmp/consumer/main.cpp <<'EOS'
+          #include <bitlane/bitlane.hpp>
+          #include <cstdio>
+          int main() {
+              bitlane::bitmap b;
+              b.insert_range(1, 9);
+              const auto wire = b.encode();
+              const auto back = bitlane::bitmap::decode(wire);
+              std::printf("card=%zu\n", b.cardinality());
+              return (b.cardinality() == 9 && back && *back == b) ? 0 : 1;
+          }
+          EOS
+          cmake -S /tmp/consumer -B /tmp/consumer/build -G Ninja \
+                -DCMAKE_PREFIX_PATH=/tmp/bitlane-prefix -DCMAKE_BUILD_TYPE=Release
+          cmake --build /tmp/consumer/build
+          /tmp/consumer/build/consumer
