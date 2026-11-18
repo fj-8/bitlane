@@ -1,0 +1,14 @@
+build/
+work/
+*.obj
+*.exe
+*.pdb
+*.ilk
+.cache/
+compile_commands.json
+CMakeCache.txt
+CMakeFiles/
+DartConfiguration.tcl
+Testing/
+.vscode/
+.idea/

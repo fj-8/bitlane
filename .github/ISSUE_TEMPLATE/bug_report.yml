@@ -1,0 +1,61 @@
+name: Bug report
+description: A query, algebra operation or decode result is wrong
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The most useful bug report here is a program that builds the bitmap and
+        prints what it got. Two thirds of the value is that the maintainer can
+        paste it straight into `tests/bitmap_tests.cpp`.
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: The declarations and calls, verbatim. Values matter — say which of them are in the same 65 536-value container.
+      render: cpp
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+      description: What the accessor, operator or `decode` should have returned.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+      description: What it returned, and whether the STL differential agrees (an `std::set` or `std::vector<bool>` equivalent is ideal).
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: representation
+    attributes:
+      label: Representation at the time
+      description: >
+        If the bug is about the container form, paste `slot_count()`,
+        `array_slots()`, `bitmap_slots()`, `memory_usage()` and
+        `bitlane::detail::intersection_path()`.
+      render: text
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: Compiler version, OS and the commit or tag you built from.
+      placeholder: MSVC 19.51 · Windows 11 · bitlane 0.4.0 (a1b2c3d)
+    validations:
+      required: true
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Pre-flight
+      options:
+        - label: I reproduced this against the current `main`.
+          required: true
+        - label: I ran `ctest --test-dir build --output-on-failure` and the suite is green apart from my case.
+          required: true
+        - label: I checked the README sections on container forms and on what bitlane is not.
+          required: true

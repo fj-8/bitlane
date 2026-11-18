@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security issue
+    url: https://github.com/fj-8/bitlane/security/advisories/new
+    about: Anything reachable from decode() is a vulnerability — please report it privately.
+  - name: Contributing rules
+    url: https://github.com/fj-8/bitlane/blob/main/CONTRIBUTING.md
+    about: Header-only, zero dependencies, no exceptions, no fabricated benchmarks — read before you code.

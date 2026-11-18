@@ -1,0 +1,54 @@
+name: Feature request
+description: Propose a new query, container behaviour or wire-format capability
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening this: bitlane is header-only with zero dependencies,
+        throws no exceptions, and has no runtime SIMD dispatch. A request that
+        needs any of those is very likely a "no", so say up front how the
+        feature could work without them.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you cannot express today
+      description: A code sample that does not work beats a paragraph of intent. Include the workload (members, universe, how dense).
+      render: cpp
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed API
+      description: The call you would like to be able to write, with its return type and failure mode.
+      render: cpp
+    validations:
+      required: true
+  - type: textarea
+    id: oracle
+    attributes:
+      label: How we would know it is right
+      description: >
+        Every feature here needs a differential oracle — `std::set`,
+        `std::vector<bool>`, `std::lower_bound` or a brute-force loop over the
+        same values. Say what you would compare the new operation against.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Workaround in the meantime
+      description: How you solve it with the current surface, if you do.
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which part does this touch
+      options:
+        - public bitmap API (include/bitlane/bitmap.hpp)
+        - container representation (include/bitlane/container.hpp)
+        - merge helpers and SIMD path (include/bitlane/simd.hpp)
+        - wire format (include/bitlane/codec.hpp)
+        - build system / packaging (CMakeLists.txt, cmake/)
+    validations:
+      required: true
