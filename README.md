@@ -314,9 +314,13 @@ Read these honestly:
   identity, and `A-B = A & (A^B)`;
 * the four compound assignment operators checked against the free-operator
   forms;
-* the SIMD merge and the galloping scalar path checked against
-  `std::set_intersection` over 400 random pairs, and `gallop` itself checked
-  against `std::lower_bound`;
+* array/array intersection checked against `std::set_intersection` over 400
+  random pairs of runs drawn from 0..39 elements, which covers both the SSE2
+  block (taken when both runs hold at least 4) and the galloping loop
+  (everything else); `gallop` is separately pinned against
+  `std::lower_bound`. A non-SSE2 target compiles the galloping loop in place of
+  the SIMD block, so what the fallback does on long skewed runs is only
+  exercised by the trials that reach it here;
 * representation invariants: form flips at exactly 4 096 members and compacts
   again at 4 096, `insert_range` across container boundaries, a whole container
   taken as a run staying bitmap-shaped, an inverted span rejected, empty
