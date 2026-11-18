@@ -61,7 +61,7 @@ nothing has to be on `PATH` and no `vcvars64` environment is needed. Pass
 
 ## What the test suite already covers
 
-Before adding a case, check whether the invariant is already asserted: 31 cases
+Before adding a case, check whether the invariant is already asserted: 32 cases
 cover membership, boundaries of the 32-bit universe, form flipping at 4 096,
 `insert_range` (including inverted spans and container-crossing spans),
 iteration order, `count_below`/`select` agreement, the four algebra operations
