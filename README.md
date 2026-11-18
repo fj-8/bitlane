@@ -240,8 +240,9 @@ time and asserts each mutation is caught.
 ## Measurements
 
 Recorded on the machine this library was developed on, from
-`./build/bitlane_bench` (Release, `/O2`, `LTCG` off, median of 6 runs per row,
-SSE2 path active):
+`./build/bitlane_bench` (Release, `/O2`, `LTCG` off, SSE2 path active). Each cell is
+the median across six invocations of the benchmark; every invocation prints an
+internal median of five timed iterations, so these are medians of medians:
 
 > Windows 11 x64 · Intel Xeon E5-2666 v3 @ 2.90 GHz · 16 GB · MSVC 19.51
 
