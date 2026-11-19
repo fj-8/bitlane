@@ -75,8 +75,9 @@ void row(const char* name, double a, double b, double c) {
 }
 
 void bytes_row(const char* name, std::size_t a, std::size_t b, std::size_t c) {
-    std::printf("%-28s %11.1f KiB %11.1f KiB %11.1f KiB\n", name, a / 1024.0, b / 1024.0,
-                c / 1024.0);
+    std::printf("%-28s %11.1f KiB %11.1f KiB %11.1f KiB\n",
+                name, static_cast<double>(a) / 1024.0, static_cast<double>(b) / 1024.0,
+                static_cast<double>(c) / 1024.0);
 }
 
 void run(const workload& w, std::uint64_t seed) {
@@ -135,21 +136,21 @@ void run(const workload& w, std::uint64_t seed) {
     const auto count_bm = [&] {
         std::size_t hits = 0;
         for (const std::uint32_t v : probes) {
-            hits += bm.contains(v) ? 1 : 0;
+            hits += bm.contains(v) ? 1u : 0u;
         }
         return hits;
     };
     const auto count_flat = [&] {
         std::size_t hits = 0;
         for (const std::uint32_t v : probes) {
-            hits += flat[v] ? 1 : 0;
+            hits += flat[v] ? 1u : 0u;
         }
         return hits;
     };
     const auto count_set = [&] {
         std::size_t hits = 0;
         for (const std::uint32_t v : probes) {
-            hits += set_.count(v) ? 1 : 0;
+            hits += set_.count(v) ? 1u : 0u;
         }
         return hits;
     };
@@ -219,12 +220,12 @@ void run(const workload& w, std::uint64_t seed) {
 
     std::size_t inter_count_flat = 0;
     for (std::size_t i = 0; i < flat.size(); ++i) {
-        inter_count_flat += (flat[i] && flat2[i]) ? 1 : 0;
+        inter_count_flat += (flat[i] && flat2[i]) ? 1u : 0u;
     }
     const double inter_flat = median_ns([&] {
         std::size_t hits = 0;
         for (std::size_t i = 0; i < flat.size(); ++i) {
-            hits += (flat[i] && flat2[i]) ? 1 : 0;
+            hits += (flat[i] && flat2[i]) ? 1u : 0u;
         }
         return hits;
     });
@@ -252,7 +253,7 @@ void run(const workload& w, std::uint64_t seed) {
               static_cast<std::size_t>(w.universe + 7) / 8 + sizeof(std::vector<bool>),
               set_.size() * 40u + set_.size() * 2 * 8u);
     std::printf("   (flat bitset covering the same members, i.e. up to max(): %.1f MiB)\n",
-                bm.naive_bytes() / (1024.0 * 1024.0));
+                static_cast<double>(bm.naive_bytes()) / (1024.0 * 1024.0));
     std::printf("   (memory rows: the bitlane column counts live heap bytes, the flat column is\n");
     std::printf("    (universe+7)/8 plus the vector object, and the std::set column is a 56-byte-per-node estimate,\n");
     std::printf("    not a measurement.)\n");
