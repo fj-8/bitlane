@@ -174,7 +174,7 @@ class container {
             for (std::size_t w = 0; w < bits_.size(); ++w) {
                 std::uint64_t word = bits_[w];
                 while (word != 0) {
-                    f(static_cast<std::uint16_t>(w * 64 + std::countr_zero(word)));
+                    f(lowest_bit_at(w, word));
                     word &= word - 1;
                 }
             }
@@ -198,13 +198,13 @@ class container {
             const std::size_t stop = low >> 6;
             std::uint32_t total = 0;
             for (std::size_t w = 0; w < stop && w < bits_.size(); ++w) {
-                total += std::popcount(bits_[w]);
+                total += popcount_of(bits_[w]);
             }
             if (stop < bits_.size()) {
                 const std::uint32_t bit = low & 63;
                 const std::uint64_t mask =
                     (bit == 0) ? 0u : span_mask(0, bit - 1);
-                total += std::popcount(bits_[stop] & mask);
+                total += popcount_of(bits_[stop] & mask);
             }
             return total;
         }
@@ -223,13 +223,13 @@ class container {
         }
         std::uint32_t seen = 0;
         for (std::size_t w = 0; w < bits_.size(); ++w) {
-            const std::uint32_t pc = std::popcount(bits_[w]);
+            const std::uint32_t pc = popcount_of(bits_[w]);
             if (seen + pc > rank) {
                 std::uint64_t word = bits_[w];
                 for (std::uint32_t k = seen; k < rank; ++k) {
                     word &= word - 1;
                 }
-                out = static_cast<std::uint16_t>(w * 64 + std::countr_zero(word));
+                out = lowest_bit_at(w, word);
                 return true;
             }
             seen += pc;
@@ -243,7 +243,7 @@ class container {
         }
         for (std::size_t w = 0; w < bits_.size(); ++w) {
             if (bits_[w] != 0) {
-                return static_cast<std::uint16_t>(w * 64 + std::countr_zero(bits_[w]));
+                return lowest_bit_at(w, bits_[w]);
             }
         }
         return 0;
@@ -255,7 +255,7 @@ class container {
         }
         for (std::size_t w = bits_.size(); w-- > 0;) {
             if (bits_[w] != 0) {
-                return static_cast<std::uint16_t>(w * 64 + 63 - std::countl_zero(bits_[w]));
+                return highest_bit_at(w, bits_[w]);
             }
         }
         return 0;
@@ -277,7 +277,7 @@ class container {
         for (std::size_t w = 0; w < bits_.size(); ++w) {
             std::uint64_t word = bits_[w];
             while (word != 0) {
-                out.push_back(static_cast<std::uint16_t>(w * 64 + std::countr_zero(word)));
+                out.push_back(lowest_bit_at(w, word));
                 word &= word - 1;
             }
         }
@@ -393,6 +393,29 @@ class container {
     }
 
   private:
+    /// `std::popcount`, `std::countr_zero` and `std::countl_zero` all answer in
+    /// `int`, which is neither of the two types the counters and bit positions in
+    /// this class are. The values cannot go negative — 0..64 and 0..65535 — but
+    /// the compiler cannot see that from a type, so the conversion is written out
+    /// once here rather than cast away at eight call sites.
+    [[nodiscard]] static std::uint32_t popcount_of(std::uint64_t word) noexcept {
+        return static_cast<std::uint32_t>(std::popcount(word));
+    }
+
+    /// Position, within this container, of the lowest set bit of `word`, which
+    /// lives at bitmap word `w`. Callers guarantee `word != 0`.
+    [[nodiscard]] static std::uint16_t lowest_bit_at(std::size_t w, std::uint64_t word) noexcept {
+        return static_cast<std::uint16_t>(
+            w * 64 + static_cast<std::size_t>(std::countr_zero(word)));
+    }
+
+    /// The same for the highest set bit, which `countl_zero` measures from the top
+    /// of the word.
+    [[nodiscard]] static std::uint16_t highest_bit_at(std::size_t w, std::uint64_t word) noexcept {
+        return static_cast<std::uint16_t>(
+            w * 64 + (63 - static_cast<std::size_t>(std::countl_zero(word))));
+    }
+
     /// Members of `other` that are also set here; `other` must be ascending.
     [[nodiscard]] std::vector<std::uint16_t> filter_by_bits(
         const std::vector<std::uint16_t>& other) const {

@@ -66,7 +66,7 @@ class bitmap {
         while (cursor <= hi) {
             const std::uint16_t key = high(cursor);
             const std::uint32_t slot_end =
-                (static_cast<std::uint64_t>(key) + 1) * kContainerSpan - 1;
+                join(key, 0xFFFFu);  // the last value in container `key`
             const std::uint32_t stop = (hi < slot_end) ? hi : slot_end;
             const std::size_t at = locate_or_prepare(key);
             slots_[at].data.add_range(low(cursor), low(stop));
@@ -214,7 +214,8 @@ class bitmap {
                     }
                     if (word_ != 0) {
                         const std::uint32_t bit = static_cast<std::uint32_t>(
-                            (word_index_ - 1) * 64 + std::countr_zero(word_));
+                            (word_index_ - 1) * 64 +
+                            static_cast<std::size_t>(std::countr_zero(word_)));
                         word_ &= word_ - 1;
                         value_ = join(owner_->slots_[slot_].key, bit);
                         done_ = false;

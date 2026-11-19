@@ -105,7 +105,8 @@ int main() {
                           static_cast<double>(wanted.cardinality()));
 
     const auto wire = wanted.encode();
-    std::printf("result ships in %zu bytes (%.1f KiB) vs %.1f KiB for a flat bitset\n", wire.size(),
-                wire.size() / 1024.0, wanted.naive_bytes() / 1024.0);
+    std::printf("result ships in %zu bytes (%.1f KiB) vs %.1f KiB for a flat bitset\n",
+                wire.size(), static_cast<double>(wire.size()) / 1024.0,
+                static_cast<double>(wanted.naive_bytes()) / 1024.0);
     return 0;
 }

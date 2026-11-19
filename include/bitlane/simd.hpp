@@ -149,7 +149,7 @@ inline std::vector<std::uint16_t> symmetric_difference_arrays(
 inline std::uint32_t popcount_words(const std::uint64_t* words, std::size_t n) noexcept {
     std::uint64_t total = 0;
     for (std::size_t i = 0; i < n; ++i) {
-        total += std::popcount(words[i]);
+        total += static_cast<std::uint64_t>(std::popcount(words[i]));
     }
     return static_cast<std::uint32_t>(total);
 }
