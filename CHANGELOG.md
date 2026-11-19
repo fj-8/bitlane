@@ -36,17 +36,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `highest_bit_at` now, and the bench and example cast their printf arguments
   explicitly. No behaviour change: every value was already in range.
 - The Development section of `README.md` now records what the `Apple Clang` leg
-  has actually done: `cancelled` with no runner ever assigned to it on five of
-  the nine most recent runs on `main` (`b38ec65`, `cb878c9`, `d617674`,
-  `b270e95`, `399b447`), a third attempt with the same empty result on
-  `b270e95`, every other job green on all five — and two runs, `714c249` and
-  `f2edfcb`, that ended `cancelled` without starting a job at all. The section
-  first said "twice on the same commit", which was true when it was written and
-  is no longer the whole story; a count taken from one afternoon's run list is a
-  count that needs re-taking, which is the same reason the eight checks exist. A
-  starved macOS pool is not a portability result, and a badge cannot tell the two
-  apart, so the difference is written down instead of being re-run until
-  something sticks.
+  has actually done: `cancelled` with no runner ever assigned to it on six of the
+  nine runs on `main` between `b38ec65` and `4d81a45` (`b38ec65`, `cb878c9`,
+  `d617674`, `b270e95`, `399b447` and `4d81a45`), a third attempt with the same
+  empty result on `b270e95`, every other job green on all six — and two runs,
+  `714c249` and `f2edfcb`, that ended `cancelled` without starting a job at all.
+  The section first said "twice on the same commit", then "five of the nine most
+  recent", and both were true when written and neither survived the next push: a
+  window that moves is not a measurement. The range is closed at both ends now
+  and the sentence names the `gh api` call it came from, so the next afternoon
+  adds a sentence instead of quietly invalidating this one. A starved macOS pool
+  is not a portability result, and a badge cannot tell the two apart, so the
+  difference is written down instead of being re-run until something sticks.
 
 ### Fixed
 - `CHECK_EQ` bound its operands by reference. An operand such as `*b.min()`

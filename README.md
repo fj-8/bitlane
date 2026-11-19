@@ -373,7 +373,7 @@ under GCC, Clang and Apple Clang (Ninja, `-Wall -Wextra -Werror`) and under MSVC
 (Visual Studio, multi-config), the same suite again under ASan and UBSan in a
 Debug build, an MSVC build with `/W4 /WX`, and an installed tree consumed by a
 separate `find_package` project — all eight green on `5af4cdf` and `e8e7b0a`,
-the two most recent commits whose macOS leg got a runner. The red runs before
+the two newest commits for which the macOS leg got a runner as this is written. The red runs before
 that were worth having: they traced four wrong `min()`/`select()` values to the
 test harness reading a byte of a destroyed `std::optional`, not to the library,
 and `CHANGELOG.md` says so in those terms. So did enabling `-Werror` for GCC and
@@ -381,18 +381,22 @@ Clang: `/W4` emits no conversion diagnostics, so twenty-some of them were
 waiting in code that had been called warning-free on the strength of MSVC alone.
 The one thing that has not been reproducible is `Apple Clang` on `macos-latest`.
 It has reported `cancelled` with no runner ever assigned to it — zero steps, an
-empty runner field — on five of the last nine runs on `main` (`b38ec65`,
-`cb878c9`, `d617674`, `b270e95`, `399b447`), and on `b270e95` it reached a third
-attempt with the same result after eighteen more minutes of queue; on every one
-of those five commits all the other checks went green. Two of the nine,
-`714c249` and `f2edfcb`, ended `cancelled` with no job started at all, which is
-what a queued `main` run becomes when a newer push arrives before it begins. A
-cancelled job with an empty runner field is a starved macOS pool rather than a
-compile failure, and the badge cannot tell them apart, so the distinction is
-written down instead of smoothed over. It matters here more than it would
-elsewhere: `Apple Clang` is one of the three legs that found the
-integer-conversion warnings this section opens with, so a pool that will not
-schedule it is a real gap in the matrix, not a cosmetic one.
+empty runner field — on six of the nine runs on `main` between `b38ec65` and
+`4d81a45` (`b38ec65`, `cb878c9`, `d617674`, `b270e95`, `399b447` and `4d81a45`),
+and on `b270e95` it reached a third attempt with the same result after eighteen
+more minutes of queue; on every one of those six commits all the other checks
+went green. Two of the nine, `714c249` and `f2edfcb`, ended `cancelled` with no
+job started at all, which is what a queued `main` run becomes when a newer push
+arrives before it begins, and the ninth, `5af4cdf`, is the newest run with all
+eight green. Both ends of that range are fixed, and
+`gh api repos/fj-8/bitlane/actions/runs?branch=main&event=push` read against each
+run's `jobs_url` is what it was written from: the nine runs after it will say
+something else and this sentence stays true. A cancelled job with an empty runner
+field is a starved macOS pool rather than a compile failure, and the badge cannot
+tell them apart, so the distinction is written down instead of smoothed over. It
+matters here more than it would elsewhere: `Apple Clang` is one of the three legs
+that found the integer-conversion warnings this section opens with, so a pool
+that will not schedule it is a real gap in the matrix, not a cosmetic one.
 
 ```console
 $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
