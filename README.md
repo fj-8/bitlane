@@ -364,16 +364,20 @@ so:
 
 Requirements: CMake ≥ 3.21, a C++20 compiler. Everything measured and asserted
 in this README was built and run locally with MSVC 19.51 (`/W4 /permissive-
-/utf-8`), warning-free, through the Visual Studio generator. The Ninja
-generator is exercised in CI rather than on this machine.
-`.github/workflows/ci.yml` runs seven jobs: each of
+/utf-8`), warning-free, through the Visual Studio generator. The Ninja generator
+and the GCC, Clang and Apple Clang builds are exercised in CI rather than on this
+machine.
+`.github/workflows/ci.yml` runs five jobs, which report as eight checks: each of
 the five headers compiled as the only include in a translation unit, the suite
-under GCC, Clang and Apple Clang in a Release build and under MSVC, an MSVC
-build with `/W4 /WX`, and an installed tree consumed by a separate
-`find_package` project — all seven green. The red runs before that were worth
-having: they traced four wrong `min()`/`select()` values to the test harness
-reading a byte of a destroyed `std::optional`, not to the library, and
-`CHANGELOG.md` says so in those terms.
+under GCC, Clang and Apple Clang (Ninja, `-Wall -Wextra -Werror`) and under MSVC
+(Visual Studio, multi-config), the same suite again under ASan and UBSan in a
+Debug build, an MSVC build with `/W4 /WX`, and an installed tree consumed by a
+separate `find_package` project — all eight green. The red runs before that were
+worth having: they traced four wrong `min()`/`select()` values to the test
+harness reading a byte of a destroyed `std::optional`, not to the library, and
+`CHANGELOG.md` says so in those terms. So did enabling `-Werror` for GCC and
+Clang: `/W4` emits no conversion diagnostics, so twenty-some of them were
+waiting in code that had been called warning-free on the strength of MSVC alone.
 
 ```console
 $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release

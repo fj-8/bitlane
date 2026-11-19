@@ -15,6 +15,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `testkit::describe`, so a failed `CHECK_EQ` prints both operands —
   `lhs: 43 / rhs: 42`, `5 elements: 7 8 9 10 ...` — instead of "values differ".
 
+### Changed
+- CI compiles the suite with `-Wall -Wextra -Werror` under GCC, Clang and Apple
+  Clang, not only `/W4 /WX` under MSVC, and runs it once more under
+  `-fsanitize=address,undefined` in a Debug build. The stricter legs found real
+  diagnostics: `/W4` emits no conversion warnings at all, so `std::popcount`,
+  `std::countr_zero` and `std::countl_zero` — all three of which answer in `int`
+  — had been fed into unsigned counters and bit positions unnoticed.
+  `container.hpp` funnels them through `popcount_of`, `lowest_bit_at` and
+  `highest_bit_at` now, and the bench and example cast their printf arguments
+  explicitly. No behaviour change: every value was already in range.
+
 ### Fixed
 - `CHECK_EQ` bound its operands by reference. An operand such as `*b.min()`
   names a byte inside the `std::optional` temporary the call returned, and that
