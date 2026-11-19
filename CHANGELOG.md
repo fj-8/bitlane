@@ -35,11 +35,18 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `container.hpp` funnels them through `popcount_of`, `lowest_bit_at` and
   `highest_bit_at` now, and the bench and example cast their printf arguments
   explicitly. No behaviour change: every value was already in range.
-- The Development section of `README.md` now records the `Apple Clang` leg that
-  reported `cancelled` with no runner ever assigned to it — twice on the same
-  commit, while the other seven checks went green on it. A starved macOS pool is
-  not a portability result, and a badge cannot tell the two apart, so the
-  difference is written down instead of being re-run until something sticks.
+- The Development section of `README.md` now records what the `Apple Clang` leg
+  has actually done: `cancelled` with no runner ever assigned to it on five of
+  the nine most recent runs on `main` (`b38ec65`, `cb878c9`, `d617674`,
+  `b270e95`, `399b447`), a third attempt with the same empty result on
+  `b270e95`, every other job green on all five — and two runs, `714c249` and
+  `f2edfcb`, that ended `cancelled` without starting a job at all. The section
+  first said "twice on the same commit", which was true when it was written and
+  is no longer the whole story; a count taken from one afternoon's run list is a
+  count that needs re-taking, which is the same reason the eight checks exist. A
+  starved macOS pool is not a portability result, and a badge cannot tell the two
+  apart, so the difference is written down instead of being re-run until
+  something sticks.
 
 ### Fixed
 - `CHECK_EQ` bound its operands by reference. An operand such as `*b.min()`
