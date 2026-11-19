@@ -411,14 +411,18 @@ an installed prefix is verified locally and by the `package` job.
 
 ## Elsewhere in this account
 
-The same rules applied in two other languages — zero dependencies, and every
+The same rules applied in three other languages — zero dependencies, and every
 number in the README measured in the same checkout:
 
 - [`karg`](https://github.com/fj-8/karg) — dependency-free Rust argument parser
   with typed accessors and errors that name the nearest valid flag.
-- [`sift`](https://github.com/fj-8/sift) — pure-stdlib Python 3.11 streaming
+- [`sift`](https://github.com/fj-8/sift) — pure-stdlib Python 3.11+ streaming
   estimators (HyperLogLog, Count-Min, t-digest, Welford, reservoir) whose frame
   format carries a version and a CRC32 for the same reason this one does.
+- [`turnstile`](https://github.com/fj-8/turnstile) — bounded MPMC queue over a
+  fixed ring for the JVM, lock-free on `VarHandle` release/acquire, with the
+  protocol's invariants proved in `docs/ALGORITHMS.md` rather than inferred from
+  the source.
 
 ## License
 
