@@ -22,7 +22,7 @@ jobs:
         run: |
           set -euo pipefail
           for f in include/bitlane/*.hpp; do
-            printf '#include <%s>\nint main() { return 0; }\n' "$f" > /tmp/probe.cpp
+            printf '#include <%s>\nint main() { return 0; }\n' "bitlane/$(basename "$f")" > /tmp/probe.cpp
             echo "--- $f"
             g++ -std=c++20 -Wall -Wextra -Wpedantic -Werror -Iinclude -fsyntax-only /tmp/probe.cpp
           done
@@ -51,16 +51,18 @@ jobs:
             cxx: clang++
           - name: MSVC
             os: windows-latest
-            generator: Visual Studio 17 2022
             cc: ""
             cxx: ""
     steps:
       - uses: actions/checkout@v4
-      # The Visual Studio generator picks its own toolset, so it gets no CC/CXX
-      # and needs the explicit platform; the Ninja legs get the opposite.
+      # The Visual Studio leg gets no -G: the Windows image ships a newer
+      # instance than any version this file could name at write time, and
+      # CMake's default generator on that runner is the installed one. A
+      # multi-config generator takes its configuration at build time, so
+      # CMAKE_BUILD_TYPE would be silently ignored here.
       - name: Configure (Visual Studio)
         if: matrix.cc == ''
-        run: cmake -S . -B build -G "${{ matrix.generator }}" -A x64 -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build -A x64
       - name: Configure (Ninja)
         if: matrix.cc != ''
         shell: bash
@@ -68,15 +70,28 @@ jobs:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
         run: cmake -S . -B build -G "${{ matrix.generator }}" -DCMAKE_BUILD_TYPE=Release
+      - name: Build (Visual Studio)
+        if: matrix.cc == ''
+        run: cmake --build build --config Release
+      - name: Test (Visual Studio)
+        if: matrix.cc == ''
+        run: ctest --test-dir build -C Release --output-on-failure
       - name: Build
+        if: matrix.cc != ''
         run: cmake --build build
       - name: Test
+        if: matrix.cc != ''
         run: ctest --test-dir build --output-on-failure
       - name: Examples
         shell: bash
         run: |
           set -euo pipefail
-          cmake --build build --target example_posting_index example_tag_query
+          if [ -z "${{ matrix.cc }}" ]; then
+            cmake --build build --config Release \
+              --target example_posting_index example_tag_query
+          else
+            cmake --build build --target example_posting_index example_tag_query
+          fi
           for wanted in example_posting_index example_tag_query; do
             exe=$(find build -maxdepth 2 -name "$wanted*" -type f ! -name '*.obj' ! -name '*.o' | head -n1)
             echo "--- $exe"
@@ -89,7 +104,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure with /WX
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_CXX_FLAGS="/WX /utf-8"
+        run: cmake -S . -B build -A x64 -DCMAKE_CXX_FLAGS="/WX /utf-8"
       - name: Build everything, including the benchmark
         run: cmake --build build --config Release
 

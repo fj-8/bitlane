@@ -12,6 +12,27 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   reject each one. `decode_rejects_malformed_input` samples chosen fields; this
   walks the whole buffer, which is the exhaustive form of the claim the docs
   make. The suite is now 32 cases (`ctest`, 1.1 s on MSVC 19.51).
+- `testkit::describe`, so a failed `CHECK_EQ` prints both operands —
+  `lhs: 43 / rhs: 42`, `5 elements: 7 8 9 10 ...` — instead of "values differ".
+
+### Fixed
+- `CHECK_EQ` bound its operands by reference. An operand such as `*b.min()`
+  names a byte inside the `std::optional` temporary the call returned, and that
+  temporary dies at the end of the initialising expression: lifetime extension
+  does not reach a subobject obtained through a function call. The suite was
+  reading destroyed storage. MSVC in both Debug and Release kept the stale bytes
+  and the checks passed; GCC `-O2` reused the slot and reported four wrong
+  values (`tests/bitmap_tests.cpp:117`, `:176`, `:235`, `:246`), which is how CI
+  found it. The library was not implicated — `cardinality`, `max` and
+  `to_vector` in those same cases were correct, as was every other check.
+  Operands are copies now.
+- The header-isolation probe in CI wrote `#include <include/bitlane/x.hpp>`,
+  which no translation unit compiled with `-Iinclude` can resolve; it includes
+  `<bitlane/x.hpp>` now.
+- The Windows CI legs named `Visual Studio 17 2022`, a generator the runner
+  image does not necessarily ship, and asked a multi-config generator for a
+  `CMAKE_BUILD_TYPE` it ignores. CMake now picks the installed generator and the
+  configuration is selected with `--config`/`-C Release`.
 
 ## [0.4.0] - 2026-11-18
 

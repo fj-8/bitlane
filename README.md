@@ -1,6 +1,7 @@
 # bitlane
 
 [![license: MIT OR Apache-2.0](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue)](#license)
+[![CI](https://github.com/fj-8/bitlane/actions/workflows/ci.yml/badge.svg)](https://github.com/fj-8/bitlane/actions/workflows/ci.yml)
 [![C++20](https://img.shields.io/badge/C%2B%2B-20-informational)](#development)
 [![dependencies: 0](https://img.shields.io/badge/dependencies-0-brightgreen)](#development)
 [![header-only](https://img.shields.io/badge/header--only-5%20files-yellow)](include/bitlane)
