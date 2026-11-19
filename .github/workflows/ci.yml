@@ -93,7 +93,14 @@ jobs:
             cmake --build build --target example_posting_index example_tag_query
           fi
           for wanted in example_posting_index example_tag_query; do
-            exe=$(find build -maxdepth 2 -name "$wanted*" -type f ! -name '*.obj' ! -name '*.o' | head -n1)
+            # A bare "$wanted*" also matches the Visual Studio generator's
+            # .vcxproj, which is XML, not something a shell can run.
+            exe=$(find build -maxdepth 2 \
+                      \( -name "$wanted*.exe" -o -name "$wanted" \) -type f | head -n1)
+            if [ -z "$exe" ]; then
+              echo "no $wanted binary under build/" >&2
+              exit 1
+            fi
             echo "--- $exe"
             "./$exe"
           done
