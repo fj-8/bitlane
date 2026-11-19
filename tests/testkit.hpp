@@ -125,8 +125,9 @@ inline std::mt19937_64 rng(std::uint64_t seed = 0xB17A2Eull) { return std::mt199
         /* By value on purpose: an operand such as *b.min() names a byte       \
          * inside the optional temporary, and that temporary dies at the end   \
          * of the initialiser. A reference bound to it reads destroyed         \
-         * storage: MSVC kept the stale bytes, GCC -O2 reused the slot and     \
-         * returned four wrong values. */                                      \
+         * storage. MSVC kept the stale bytes and the checks passed; GCC       \
+         * said "dangling pointer to an unnamed temporary" and then produced   \
+         * four wrong values. */                                               \
         const auto bitlane_lhs = (a);                                          \
         const auto bitlane_rhs = (b);                                          \
         if (!(bitlane_lhs == bitlane_rhs)) {                                   \
@@ -136,5 +137,4 @@ inline std::mt19937_64 rng(std::uint64_t seed = 0xB17A2Eull) { return std::mt199
                             ::testkit::describe(bitlane_rhs));                 \
         }                                                                      \
     } while (0)
-
 #endif // BITLANE_TESTKIT_HPP

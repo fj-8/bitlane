@@ -21,11 +21,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   temporary dies at the end of the initialising expression: lifetime extension
   does not reach a subobject obtained through a function call. The suite was
   reading destroyed storage. MSVC in both Debug and Release kept the stale bytes
-  and the checks passed; GCC `-O2` reused the slot and reported four wrong
-  values (`tests/bitmap_tests.cpp:117`, `:176`, `:235`, `:246`), which is how CI
-  found it. The library was not implicated — `cardinality`, `max` and
-  `to_vector` in those same cases were correct, as was every other check.
-  Operands are copies now.
+  and every check passed. GCC in the CI Release build said so out loud —
+  `warning: using a dangling pointer to an unnamed temporary
+  [-Wdangling-pointer=]`, pointing at `tests/testkit.hpp` and at the unnamed
+  temporary in each `CHECK_EQ(*b.select(...), ...)` — and then reported four
+  wrong values (`tests/bitmap_tests.cpp:117`, `:176`, `:235`, `:246`). The
+  library was not implicated: `cardinality`, `max` and `to_vector` in those same
+  cases were correct, as was every other check in the suite. Operands are
+  copies now.
 - The header-isolation probe in CI wrote `#include <include/bitlane/x.hpp>`,
   which no translation unit compiled with `-Iinclude` can resolve; it includes
   `<bitlane/x.hpp>` now.
