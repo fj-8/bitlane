@@ -1,0 +1,83 @@
+name: Something is wrong
+description: A set operation answers wrong, a frame decodes that should not, the package will not configure, or a number in the README does not reproduce
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The library is header-only and never throws, so a wrong answer usually
+        arrives as a value rather than an exception — which is why the reports with
+        the smallest input in them are the most useful. The test harness prints both
+        operands of a failed comparison, so quoting that line verbatim is better
+        than paraphrasing it.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where
+      options:
+        - insert, erase, contains, insert_range
+        - the set algebra (| & ^ - and the compounds)
+        - cardinality, min, max, count_below, select, iteration
+        - encode and decode, the wire format, a frame decode that should have been rejected
+        - fingerprint, memory_usage, naive_bytes, slot counters
+        - SIMD dispatch
+        - the CMake package, find_package, install layout
+        - an example, the bench, or a README number
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: >-
+        The failed `CHECK` line, or the value that came back. For a frame, say which
+        byte offset and which field.
+      placeholder: |
+        FAIL select_works_inside_a_bitmap_container
+             b.select(3) == expected failed
+        lhs: 43
+        rhs: 42
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: The values and the calls
+      description: >-
+        The shortest sequence that shows it. Values around a container boundary
+        (the 4096th element and its neighbours) are where the interesting ones hide.
+      render: cpp
+    validations:
+      required: true
+  - type: input
+    id: compiler
+    attributes:
+      label: Compiler and version
+      description: >-
+        `cl` / `g++ --version` / `clang++ --version`, and the CMake generator, since
+        the four compilers are held to the same `-Werror` bar and are not the same
+        compiler.
+      placeholder: MSVC 19.51 with the Visual Studio generator, x64, Release
+    validations:
+      required: true
+  - type: textarea
+    id: commands
+    attributes:
+      label: What you ran
+      value: |
+        cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
+        ctest --test-dir build --output-on-failure
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: sanitizers
+    attributes:
+      label: Under the sanitizers, if you got that far
+      description: >-
+        CI runs the whole suite again under ASan and UBSan in a Debug build. If you
+        can reproduce there and not in Release, that difference is the report.
+    validations:
+      required: false

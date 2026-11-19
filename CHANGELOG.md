@@ -18,6 +18,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   make. The suite is now 32 cases (`ctest`, 1.1 s on MSVC 19.51).
 - `testkit::describe`, so a failed `CHECK_EQ` prints both operands —
   `lhs: 43 / rhs: 42`, `5 elements: 7 8 9 10 ...` — instead of "values differ".
+- `.github/ISSUE_TEMPLATE/bug-report.yml` and `.github/dependabot.yml`. The form
+  asks for the values and the calls, the compiler and generator, and the failed
+  `CHECK` line in the shape the harness prints it; the Dependabot config watches
+  `github-actions` only, because a header-only library has no dependency section
+  to update and the action pins are the only versions in the repository that can
+  go stale.
 
 ### Changed
 - CI compiles the suite with `-Wall -Wextra -Werror` under GCC, Clang and Apple
@@ -29,6 +35,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `container.hpp` funnels them through `popcount_of`, `lowest_bit_at` and
   `highest_bit_at` now, and the bench and example cast their printf arguments
   explicitly. No behaviour change: every value was already in range.
+- The Development section of `README.md` now records the `Apple Clang` leg that
+  reported `cancelled` with no runner ever assigned to it — twice on the same
+  commit, while the other seven checks went green on it. A starved macOS pool is
+  not a portability result, and a badge cannot tell the two apart, so the
+  difference is written down instead of being re-run until something sticks.
 
 ### Fixed
 - `CHECK_EQ` bound its operands by reference. An operand such as `*b.min()`
