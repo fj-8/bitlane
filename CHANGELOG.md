@@ -7,6 +7,10 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- A root `LICENSE` file stating both grants, the `MIT OR Apache-2.0` SPDX
+  identifier that heads every header, and the contribution clause. The full texts
+  were already in `LICENSE-APACHE` and `LICENSE-MIT`; this is the filename tools
+  reach for when they do not read the README. No terms changed.
 - `every_single_byte_edit_of_a_frame_is_rejected` in `tests/bitmap_tests.cpp`:
   flip the high bit at every offset of an encoded frame and require `decode` to
   reject each one. `decode_rejects_malformed_input` samples chosen fields; this
