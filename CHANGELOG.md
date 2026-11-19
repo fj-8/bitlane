@@ -33,6 +33,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   image does not necessarily ship, and asked a multi-config generator for a
   `CMAKE_BUILD_TYPE` it ignores. CMake now picks the installed generator and the
   configuration is selected with `--config`/`-C Release`.
+- The CI example step looked for `example_*` with a wildcard that also matched
+  the Visual Studio project files, then tried to run the XML it found. It now
+  matches the binary by name or `.exe` and fails loudly when neither exists.
 
 ## [0.4.0] - 2026-11-18
 

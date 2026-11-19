@@ -365,8 +365,14 @@ so:
 Requirements: CMake ≥ 3.21, a C++20 compiler. Everything measured and asserted
 in this README was built and run locally with MSVC 19.51 (`/W4 /permissive-
 /utf-8`), warning-free, both through the Ninja generator and through the Visual
-Studio generator. Each of the five headers additionally compiles as the only
-include in a translation unit.
+Studio generator. `.github/workflows/ci.yml` repeats it as seven jobs: each of
+the five headers compiled as the only include in a translation unit, the suite
+under GCC, Clang and Apple Clang in a Release build and under MSVC, an MSVC
+build with `/W4 /WX`, and an installed tree consumed by a separate
+`find_package` project — all seven green. The red runs before that were worth
+having: they traced four wrong `min()`/`select()` values to the test harness
+reading a byte of a destroyed `std::optional`, not to the library, and
+`CHANGELOG.md` says so in those terms.
 
 ```console
 $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -399,8 +405,8 @@ Consumers importing the interface target keep their own settings.
 `example_tag_query` builds 8 tag posting lists over 2 000 000 product ids and
 answers a compound query; `example_posting_index` indexes 8 documents and
 prints the algebra over real terms. Both outputs shown in their headers are the
-actual captured runs, and `find_package` was verified from an installed prefix
-locally, not in a hosted pipeline.
+actual captured runs, and every CI job runs both binaries. `find_package` from
+an installed prefix is verified locally and by the `package` job.
 
 ## Elsewhere in this account
 
