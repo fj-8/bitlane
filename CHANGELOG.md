@@ -110,3 +110,6 @@ Initial public release.
   universe).
 - No runtime SIMD dispatch, no 64-bit domain, no `std::vector<bool>`-style
   proxy iterators — see the README section "What it deliberately is not".
+
+[Unreleased]: https://github.com/fj-8/bitlane/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/fj-8/bitlane/releases/tag/v0.4.0
