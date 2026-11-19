@@ -24,7 +24,7 @@ jobs:
     name: Every header compiles alone
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: One translation unit per header
         run: |
           set -euo pipefail
@@ -61,7 +61,7 @@ jobs:
             cc: ""
             cxx: ""
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # The Visual Studio leg gets no -G: the Windows image ships a newer
       # instance than any version this file could name at write time, and
       # CMake's default generator on that runner is the installed one. A
@@ -120,7 +120,7 @@ jobs:
     name: ASan and UBSan over the suite
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Debug rather than Release: the sanitizers instrument what is allocated and
       # what is read, and an inlined Release build hides the frame the report
       # needs. -O1 keeps the run short enough to be worth the queue.
@@ -138,7 +138,7 @@ jobs:
     name: Zero warnings (/W4 /WX)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Configure with /WX
         run: cmake -S . -B build -A x64 -DCMAKE_CXX_FLAGS="/WX /utf-8"
       - name: Build everything, including the benchmark
@@ -148,7 +148,7 @@ jobs:
     name: Installed package is usable
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Configure, build and install
         run: |
           cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
