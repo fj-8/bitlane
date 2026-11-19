@@ -378,6 +378,12 @@ harness reading a byte of a destroyed `std::optional`, not to the library, and
 `CHANGELOG.md` says so in those terms. So did enabling `-Werror` for GCC and
 Clang: `/W4` emits no conversion diagnostics, so twenty-some of them were
 waiting in code that had been called warning-free on the strength of MSVC alone.
+The one thing that has not been reproducible is `Apple Clang` on `macos-latest`:
+twice on the same commit it reported `cancelled` with no runner ever assigned to
+it, while the other seven checks went green on that commit. A cancelled job with
+an empty runner field is a starved macOS pool rather than a compile failure, and
+the badge cannot tell them apart. It is recorded rather than smoothed over: the
+same commit was re-run, and the leg was cancelled again.
 
 ```console
 $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
