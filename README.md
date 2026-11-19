@@ -364,8 +364,9 @@ so:
 
 Requirements: CMake ≥ 3.21, a C++20 compiler. Everything measured and asserted
 in this README was built and run locally with MSVC 19.51 (`/W4 /permissive-
-/utf-8`), warning-free, both through the Ninja generator and through the Visual
-Studio generator. `.github/workflows/ci.yml` repeats it as seven jobs: each of
+/utf-8`), warning-free, through the Visual Studio generator. The Ninja
+generator is exercised in CI rather than on this machine.
+`.github/workflows/ci.yml` runs seven jobs: each of
 the five headers compiled as the only include in a translation unit, the suite
 under GCC, Clang and Apple Clang in a Release build and under MSVC, an MSVC
 build with `/W4 /WX`, and an installed tree consumed by a separate
