@@ -387,8 +387,8 @@ and on `b270e95` it reached a third attempt with the same result after eighteen
 more minutes of queue; on every one of those six commits all the other checks
 went green. Two of the nine, `714c249` and `f2edfcb`, ended `cancelled` with no
 job started at all, which is what a queued `main` run becomes when a newer push
-arrives before it begins, and the ninth, `5af4cdf`, is the newest run with all
-eight green. Both ends of that range are fixed, and
+arrives before it begins, and the ninth, `5af4cdf`, is green on all eight. Both
+ends of that range are fixed, and
 `gh api repos/fj-8/bitlane/actions/runs?branch=main&event=push` read against each
 run's `jobs_url` is what it was written from: the nine runs after it will say
 something else and this sentence stays true. A cancelled job with an empty runner
